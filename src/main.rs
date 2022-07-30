@@ -1,17 +1,24 @@
-use std::io;
+// use anyhow::Result;
+use color_eyre::eyre::Result;
 use tokio::{
     fs::File,
     io::{AsyncReadExt, AsyncWriteExt},
     net::UdpSocket,
 };
+use dnsrs::errors::DNSError;
 
 const HOST: &str = "8.8.8.8";
 const PORT: u16 = 53;
 const DNS_SERVER: (&str, u16) = (HOST, PORT);
 const ONE_KB: usize = 1024;
 
+
 #[tokio::main]
-async fn main() -> io::Result<()> {
+async fn main() -> Result<()> {
+    color_eyre::install()?;
+
+    return Err(DNSError::Unknown)?;
+
     let mut query_buff = [0; ONE_KB];
     let bytes_read = {
         let mut file = File::open("test_data/query_packet").await?;
