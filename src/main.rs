@@ -1,23 +1,21 @@
 // use anyhow::Result;
 use color_eyre::eyre::Result;
+use dnsrs::dns::buffer::Buffer;
+// use dnsrs::errors::DNSError;
 use tokio::{
     fs::File,
     io::{AsyncReadExt, AsyncWriteExt},
     net::UdpSocket,
 };
-use dnsrs::errors::DNSError;
 
 const HOST: &str = "8.8.8.8";
 const PORT: u16 = 53;
 const DNS_SERVER: (&str, u16) = (HOST, PORT);
 const ONE_KB: usize = 1024;
 
-
 #[tokio::main]
 async fn main() -> Result<()> {
     color_eyre::install()?;
-
-    return Err(DNSError::Unknown)?;
 
     let mut query_buff = [0; ONE_KB];
     let bytes_read = {
@@ -25,6 +23,9 @@ async fn main() -> Result<()> {
         file.read(&mut query_buff).await?
     };
     let query_bytes = &query_buff[..bytes_read];
+
+    let buff = Buffer::from(query_bytes);
+    println!("{:?}", buff);
 
     println!("Bytes read: {}", bytes_read);
 

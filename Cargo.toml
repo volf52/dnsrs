@@ -9,11 +9,11 @@ opt-level = 3
 
 [dependencies]
 # anyhow = "1.0.58"
-bytes = "1.2.0"
+bytes = "1.2.1"
 chrono = "0.4.19"
 clap = "3.2.16"
 color-eyre = "0.6.2"
 eyre = "0.6.8"
-thiserror = "1.0.31"
-tokio = { version = "1.20.0", features = ["net", "macros", "rt", "rt-multi-thread", "fs", "io-util"] }
+thiserror = "1.0.32"
+tokio = { version = "1.20.1", features = ["net", "macros", "rt", "rt-multi-thread", "fs", "io-util"] }
 tracing = { version = "0.1.36", features = ["log", "async-await"] }
