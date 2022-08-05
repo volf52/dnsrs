@@ -1,25 +1,23 @@
 use std::str;
 
-use crate::utils::errors::DNSError;
+use crate::{utils::errors::DNSError, Result};
 
 pub const DEFAULT_BUFFER_SIZE: usize = 1024; // 1kB
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
-pub struct Buffer {
+pub struct DNSBuffer {
     data: Vec<u8>,
     offset: usize,
     capacity: usize,
 }
 
-type Result<T> = std::result::Result<T, DNSError>;
-
-impl Default for Buffer {
+impl Default for DNSBuffer {
     fn default() -> Self {
         Self::with_capacity(DEFAULT_BUFFER_SIZE)
     }
 }
 
-impl From<Vec<u8>> for Buffer {
+impl From<Vec<u8>> for DNSBuffer {
     fn from(vec: Vec<u8>) -> Self {
         let cap = vec.len();
 
@@ -30,7 +28,7 @@ impl From<Vec<u8>> for Buffer {
     }
 }
 
-impl From<&[u8]> for Buffer {
+impl From<&[u8]> for DNSBuffer {
     fn from(b: &[u8]) -> Self {
         let cap = b.len();
 
@@ -41,7 +39,7 @@ impl From<&[u8]> for Buffer {
     }
 }
 
-impl Buffer {
+impl DNSBuffer {
     pub fn with_capacity(capacity: usize) -> Self {
         Self {
             data: vec![0; capacity],

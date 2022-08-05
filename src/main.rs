@@ -1,6 +1,6 @@
 // use anyhow::Result;
 use color_eyre::eyre::Result;
-use dnsrs::dns::buffer::Buffer;
+use dnsrs::dns::{buffer::DNSBuffer, DNSHeader};
 // use dnsrs::errors::DNSError;
 use tokio::{
     fs::File,
@@ -23,22 +23,13 @@ async fn main() -> Result<()> {
         file.read(&mut query_buff).await?
     };
     let query_bytes = &query_buff[..bytes_read];
-
-    let buff = Buffer::from(query_bytes);
-    println!("{:?}", buff);
-    println!("{:?}", query_bytes);
-    println!("Size: {}", std::mem::size_of::<Buffer>());
-
     println!("Bytes read: {}", bytes_read);
 
-    let tmp = vec![240, 159, 146, 150];
-    let mut b = Buffer::from(&tmp[..]);
-    let mut b2 = Buffer::with_capacity(4);
-    let s = b.read_string(4)?;
-    println!("{}", s);
-    b2.write_string(s)?;
-    println!("{:?}", b2);
-    b2.write_u8(1)?;
+    let mut buff = DNSBuffer::from(query_bytes);
+    let qheader = DNSHeader::from_buff(&mut buff)?;
+
+    println!("{:?}", buff);
+    println!("{}", qheader);
 
     let mut resp_buff = [0; ONE_KB];
 
