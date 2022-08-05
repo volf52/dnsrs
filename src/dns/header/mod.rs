@@ -28,6 +28,7 @@ impl std::fmt::Display for DNSHeader {
 }
 
 impl DNSHeader {
+    /// Create a `DNSHeader` from bytes in the [`buff`]
     pub fn from_buff(buff: &mut DNSBuffer) -> Result<Self> {
         let id = buff.read_u16()?;
         let flag_val = buff.read_u16()?;
@@ -40,9 +41,9 @@ impl DNSHeader {
 
         Ok(Self {
             id,
+            flags,
             n_questions,
             n_answers,
-            flags,
         })
     }
 }

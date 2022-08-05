@@ -15,4 +15,13 @@ pub enum DNSError {
     // DNS Buffer Errors
     #[error("Buffer Full. Reached End")]
     BufferFull,
+
+    #[error("Invalid Jmp Idx `{0}`")]
+    InvalidJmpIdx(u16),
+
+    #[error("Unterminated Label Sequence")]
+    UnterminatedLabelSequence,
+
+    #[error("Not enough bytes left in buffer for next label part. Current idx {0}")]
+    NotEnoughtBytesForLabelPart(usize),
 }

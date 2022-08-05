@@ -1,7 +1,6 @@
 // use anyhow::Result;
 use color_eyre::eyre::Result;
-use dnsrs::dns::{buffer::DNSBuffer, DNSHeader};
-// use dnsrs::errors::DNSError;
+use dnsrs::dns::{buffer::DNSBuffer, lbl_sequence::LabelSequence, DNSHeader};
 use tokio::{
     fs::File,
     io::{AsyncReadExt, AsyncWriteExt},
@@ -27,9 +26,11 @@ async fn main() -> Result<()> {
 
     let mut buff = DNSBuffer::from(query_bytes);
     let qheader = DNSHeader::from_buff(&mut buff)?;
+    let lbl1 = LabelSequence::from_buff(&mut buff)?;
 
     println!("{:?}", buff);
     println!("{}", qheader);
+    println!("{:?}", lbl1);
 
     let mut resp_buff = [0; ONE_KB];
 

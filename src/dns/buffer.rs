@@ -40,6 +40,7 @@ impl From<&[u8]> for DNSBuffer {
 }
 
 impl DNSBuffer {
+    #[must_use]
     pub fn with_capacity(capacity: usize) -> Self {
         Self {
             data: vec![0; capacity],
@@ -48,7 +49,31 @@ impl DNSBuffer {
         }
     }
 
-    fn verify_has_capacity(&self, n: usize) -> Result<()> {
+    #[must_use]
+    pub const fn offset(&self) -> usize {
+        self.offset
+    }
+
+    #[must_use]
+    pub const fn capacity(&self) -> usize {
+        self.capacity
+    }
+
+    #[must_use]
+    pub fn slice_from(&self, start_idx: usize) -> &[u8] {
+        &self.data[start_idx..]
+    }
+
+    #[must_use]
+    pub fn deep_slice_from(&self, start: usize) -> Vec<u8> {
+        let mut v = Vec::with_capacity(self.capacity() - start);
+
+        v.copy_from_slice(&self.data[start..]);
+
+        v
+    }
+
+    pub(crate) const fn verify_has_capacity(&self, n: usize) -> Result<()> {
         if self.offset + n > self.capacity {
             Err(DNSError::BufferFull)
         } else {
@@ -57,10 +82,12 @@ impl DNSBuffer {
     }
 
     // Read Methods
+    #[must_use]
     pub fn peek(&self) -> u8 {
         self.data[self.offset]
     }
 
+    /// Reads a u8 from the buffer
     pub fn read_u8(&mut self) -> Result<u8> {
         self.verify_has_capacity(1)?;
 
@@ -70,6 +97,7 @@ impl DNSBuffer {
         Ok(byte)
     }
 
+    /// Reads a u16 from the buffer
     pub fn read_u16(&mut self) -> Result<u16> {
         self.verify_has_capacity(2)?;
 
@@ -80,6 +108,7 @@ impl DNSBuffer {
         Ok(u16::from_be_bytes([d1, d2]))
     }
 
+    /// Reads a u32 from the buffer
     pub fn read_u32(&mut self) -> Result<u32> {
         self.verify_has_capacity(4)?;
 
@@ -92,6 +121,7 @@ impl DNSBuffer {
         Ok(u32::from_be_bytes([d1, d2, d3, d4]))
     }
 
+    /// Reads a string of length [`len`] from the buffer
     pub fn read_string(&mut self, len: usize) -> Result<&str> {
         self.verify_has_capacity(len)?;
 
@@ -103,6 +133,8 @@ impl DNSBuffer {
     }
 
     // Write Methods
+
+    /// Writes a u8 to the buffer
     pub fn write_u8(&mut self, val: u8) -> Result<()> {
         self.verify_has_capacity(1)?;
 
@@ -112,6 +144,7 @@ impl DNSBuffer {
         Ok(())
     }
 
+    /// Writes a u16 to the buffer
     pub fn write_u16(&mut self, val: u16) -> Result<()> {
         self.verify_has_capacity(2)?;
 
@@ -125,6 +158,7 @@ impl DNSBuffer {
         Ok(())
     }
 
+    /// Writes a u32 to the buffer
     pub fn write_u32(&mut self, val: u32) -> Result<()> {
         self.verify_has_capacity(4)?;
 
@@ -140,6 +174,7 @@ impl DNSBuffer {
         Ok(())
     }
 
+    /// Writes the string [`s`] to the buffer
     pub fn write_string(&mut self, s: &str) -> Result<()> {
         let len = s.len();
         self.verify_has_capacity(len)?;

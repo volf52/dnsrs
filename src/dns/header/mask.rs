@@ -9,18 +9,17 @@ pub(super) enum HeaderMask {
 }
 
 impl HeaderMask {
-    pub(super) fn value(&self) -> u8 {
+    pub(super) const fn value(&self) -> u8 {
         match self {
-            HeaderMask::QR => 0x80,
-            HeaderMask::AA => 0x04,
-            HeaderMask::TC => 0x02,
-            HeaderMask::RD => 0x01,
-            HeaderMask::RA => 0x80,
-            HeaderMask::RCode => 0x0F,
+            Self::QR | Self::RA => 0x80,
+            Self::AA => 0x04,
+            Self::TC => 0x02,
+            Self::RD => 0x01,
+            Self::RCode => 0x0F,
         }
     }
 
-    pub(super) fn is_set(&self, container: u8) -> bool {
+    pub(super) const fn is_set(&self, container: u8) -> bool {
         (self.value() & container) != 0
     }
 }

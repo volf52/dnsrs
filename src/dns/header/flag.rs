@@ -17,40 +17,40 @@ impl From<u16> for HeaderFlags {
 
 impl From<HeaderFlags> for u16 {
     fn from(flag: HeaderFlags) -> Self {
-        let mut val: u16 = flag.byte1 as u16;
+        let mut val: Self = Self::from(flag.byte1);
         val <<= 8;
-        val += flag.byte2 as u16;
+        val += Self::from(flag.byte2);
 
         val
     }
 }
 
 impl HeaderFlags {
-    fn qr(&self) -> bool {
+    const fn qr(self) -> bool {
         HeaderMask::QR.is_set(self.byte1)
     }
 
-    fn aa(&self) -> bool {
+    const fn aa(self) -> bool {
         HeaderMask::AA.is_set(self.byte1)
     }
 
-    fn tc(&self) -> bool {
+    const fn tc(self) -> bool {
         HeaderMask::TC.is_set(self.byte1)
     }
 
-    fn rd(&self) -> bool {
+    const fn rd(self) -> bool {
         HeaderMask::RD.is_set(self.byte1)
     }
 
-    fn ra(&self) -> bool {
+    const fn ra(self) -> bool {
         HeaderMask::RA.is_set(self.byte2)
     }
 
-    fn z(&self) -> u8 {
+    const fn z() -> u8 {
         0x02
     }
 
-    fn rcode(&self) -> u8 {
+    const fn rcode(self) -> u8 {
         HeaderMask::RCode.value() & self.byte2
     }
 }
@@ -62,7 +62,7 @@ impl std::fmt::Display for HeaderFlags {
         let tc = self.tc();
         let rd = self.rd();
         let ra = self.ra();
-        let z = self.z();
+        let z = Self::z();
         let rcode = self.rcode();
 
         write!(
