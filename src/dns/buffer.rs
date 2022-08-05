@@ -1,4 +1,3 @@
-use eyre::Result;
 use std::str;
 
 use crate::utils::errors::DNSError;
@@ -11,6 +10,8 @@ pub struct Buffer {
     offset: usize,
     capacity: usize,
 }
+
+type Result<T> = std::result::Result<T, DNSError>;
 
 impl Default for Buffer {
     fn default() -> Self {
@@ -50,8 +51,8 @@ impl Buffer {
     }
 
     fn verify_has_capacity(&self, n: usize) -> Result<()> {
-        if self.offset + n >= self.capacity {
-            Err(DNSError::BufferFull)?
+        if self.offset + n > self.capacity {
+            Err(DNSError::BufferFull)
         } else {
             Ok(())
         }
