@@ -36,8 +36,9 @@ async fn main() -> Result<()> {
     let mut b2 = Buffer::with_capacity(4);
     let s = b.read_string(4)?;
     println!("{}", s);
-    b2.write_string(s);
+    b2.write_string(s)?;
     println!("{:?}", b2);
+    b2.write_u8(1)?;
 
     let mut resp_buff = [0; ONE_KB];
 

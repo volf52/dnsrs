@@ -11,4 +11,8 @@ pub enum DNSError {
 
     #[error("Str UTF-8 Error")]
     Utf8Error(#[from] std::str::Utf8Error),
+
+    // DNS Buffer Errors
+    #[error("Buffer Full. Reached End")]
+    BufferFull,
 }
