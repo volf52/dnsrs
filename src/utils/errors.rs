@@ -8,4 +8,7 @@ pub enum DNSError {
 
     #[error("IO Error")]
     IOError(#[from] io::Error),
+
+    #[error("Str UTF-8 Error")]
+    Utf8Error(#[from] std::str::Utf8Error),
 }

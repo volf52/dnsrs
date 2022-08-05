@@ -26,8 +26,18 @@ async fn main() -> Result<()> {
 
     let buff = Buffer::from(query_bytes);
     println!("{:?}", buff);
+    println!("{:?}", query_bytes);
+    println!("Size: {}", std::mem::size_of::<Buffer>());
 
     println!("Bytes read: {}", bytes_read);
+
+    let tmp = vec![240, 159, 146, 150];
+    let mut b = Buffer::from(&tmp[..]);
+    let mut b2 = Buffer::with_capacity(4);
+    let s = b.read_string(4)?;
+    println!("{}", s);
+    b2.write_string(s);
+    println!("{:?}", b2);
 
     let mut resp_buff = [0; ONE_KB];
 

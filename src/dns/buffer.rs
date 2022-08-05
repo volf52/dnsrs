@@ -1,10 +1,13 @@
+use eyre::Result;
+use std::str;
+
 pub const DEFAULT_BUFFER_SIZE: usize = 1024; // 1kB
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Buffer {
     data: Vec<u8>,
     offset: usize,
-    // capacity: usize,
+    capacity: usize,
 }
 
 impl Default for Buffer {
@@ -36,12 +39,11 @@ impl From<&[u8]> for Buffer {
 }
 
 impl Buffer {
-    #[must_use]
     pub fn with_capacity(capacity: usize) -> Self {
         Self {
             data: vec![0; capacity],
             offset: 0,
-            // capacity,
+            capacity,
         }
     }
 
@@ -75,6 +77,14 @@ impl Buffer {
         u32::from_be_bytes([d1, d2, d3, d4])
     }
 
+    pub fn read_string(&mut self, len: usize) -> Result<&str> {
+        let b = &self.data[self.offset..self.offset + len];
+        let val = std::str::from_utf8(b)?;
+        self.offset += len;
+
+        Ok(val)
+    }
+
     // Write Methods
     pub fn write_u8(&mut self, val: u8) {
         self.data[self.offset] = val;
@@ -99,5 +109,11 @@ impl Buffer {
         self.data[self.offset + 3] = d[3];
 
         self.offset += 4;
+    }
+
+    pub fn write_string(&mut self, s: &str) {
+        let len = s.len();
+        self.data[self.offset..self.offset + len].copy_from_slice(s.as_bytes());
+        self.offset += len;
     }
 }
