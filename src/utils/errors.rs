@@ -24,4 +24,7 @@ pub enum DNSError {
 
     #[error("Not enough bytes left in buffer for next label part. Current idx {0}")]
     NotEnoughtBytesForLabelPart(usize),
+
+    #[error("Unknown Record Type Value {0}")]
+    UnknownRecordType(u16),
 }
