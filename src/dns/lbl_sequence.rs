@@ -59,3 +59,9 @@ impl LabelSequence {
         self.domain.clone()
     }
 }
+
+impl std::fmt::Display for LabelSequence {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, ";; {} ;;", self.domain())
+    }
+}
