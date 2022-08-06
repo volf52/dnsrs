@@ -4,7 +4,7 @@ use crate::{utils::errors::DNSError, Result};
 
 pub const DEFAULT_BUFFER_SIZE: usize = 1024; // 1kB
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug)]
 pub struct DNSBuffer {
     data: Vec<u8>,
     offset: usize,

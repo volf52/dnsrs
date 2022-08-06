@@ -4,9 +4,9 @@ mod mask;
 use flag::HeaderFlags;
 
 use super::buffer::DNSBuffer;
-use crate::Result;
+use crate::DNSError;
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug)]
 pub struct DNSHeader {
     id: u16,
     flags: HeaderFlags,
@@ -27,15 +27,16 @@ impl std::fmt::Display for DNSHeader {
     }
 }
 
-impl DNSHeader {
-    /// Create a `DNSHeader` from bytes in the [`buff`]
-    pub fn from_buff(buff: &mut DNSBuffer) -> Result<Self> {
+impl TryFrom<&mut DNSBuffer> for DNSHeader {
+    type Error = DNSError;
+
+    fn try_from(buff: &mut DNSBuffer) -> std::result::Result<Self, Self::Error> {
         let id = buff.read_u16()?;
         let flag_val = buff.read_u16()?;
         let n_questions = buff.read_u16()?;
         let n_answers = buff.read_u16()?;
 
-        buff.read_u32()?; // Discard next 2 countes
+        buff.read_u32()?; // Discard next 2 counts
 
         let flags: HeaderFlags = flag_val.into();
 

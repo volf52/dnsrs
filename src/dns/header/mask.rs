@@ -8,24 +8,34 @@ pub(super) enum HeaderMask {
     RCode,
 }
 
-impl HeaderMask {
-    pub(super) const fn value(&self) -> u8 {
-        match self {
-            Self::QR | Self::RA => 0x80,
-            Self::AA => 0x04,
-            Self::TC => 0x02,
-            Self::RD => 0x01,
-            Self::RCode => 0x0F,
+impl From<&HeaderMask> for u8 {
+    fn from(mask: &HeaderMask) -> Self {
+        match mask {
+            HeaderMask::QR | HeaderMask::RA => 0x80,
+            HeaderMask::AA => 0x04,
+            HeaderMask::TC => 0x02,
+            HeaderMask::RD => 0x01,
+            HeaderMask::RCode => 0x0F,
         }
     }
+}
 
-    pub(super) const fn is_set(&self, container: u8) -> bool {
-        (self.value() & container) != 0
+impl HeaderMask {
+    pub(super) fn val(&self) -> u8 {
+        self.into()
+    }
+
+    pub(super) fn is_set(&self, container: u8) -> bool {
+        let val: u8 = self.into();
+
+        (val & container) != 0
     }
 }
 
 impl std::fmt::Display for HeaderMask {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "HeaderMask({})", self.value())
+        let val: u8 = self.into();
+
+        write!(f, "HeaderMask({})", val)
     }
 }

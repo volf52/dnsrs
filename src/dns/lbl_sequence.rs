@@ -1,5 +1,5 @@
 use super::buffer::DNSBuffer;
-use crate::{utils::errors::DNSError, Result};
+use crate::utils::errors::DNSError;
 
 const NULL_BYTE: u8 = 0x00;
 const JMP_IDX: u8 = 0xC0;
@@ -11,9 +11,10 @@ pub struct LabelSequence {
     domain: String,
 }
 
-impl LabelSequence {
-    /// Create a label sequence from a buffer
-    pub fn from_buff(buff: &mut DNSBuffer) -> Result<Self> {
+impl TryFrom<&mut DNSBuffer> for LabelSequence {
+    type Error = DNSError;
+
+    fn try_from(buff: &mut DNSBuffer) -> std::result::Result<Self, Self::Error> {
         buff.verify_has_capacity(1)?;
         let buff_cap = buff.capacity();
 
@@ -28,7 +29,7 @@ impl LabelSequence {
             let copied_slice = buff.deep_slice_from(jmp_idx as usize);
             let mut inner_buff = DNSBuffer::from(copied_slice);
 
-            Self::from_buff(&mut inner_buff)
+            Self::try_from(&mut inner_buff)
         } else {
             let mut parts = Vec::<String>::new();
 
@@ -50,7 +51,9 @@ impl LabelSequence {
             Ok(Self { domain })
         }
     }
+}
 
+impl LabelSequence {
     #[must_use]
     pub fn domain(&self) -> String {
         self.domain.clone()

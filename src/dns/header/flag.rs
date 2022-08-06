@@ -1,6 +1,6 @@
 use super::mask::HeaderMask;
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
+#[derive(Debug)]
 pub(super) struct HeaderFlags {
     byte1: u8,
     byte2: u8,
@@ -26,23 +26,23 @@ impl From<HeaderFlags> for u16 {
 }
 
 impl HeaderFlags {
-    const fn qr(self) -> bool {
+    fn qr(&self) -> bool {
         HeaderMask::QR.is_set(self.byte1)
     }
 
-    const fn aa(self) -> bool {
+    fn aa(&self) -> bool {
         HeaderMask::AA.is_set(self.byte1)
     }
 
-    const fn tc(self) -> bool {
+    fn tc(&self) -> bool {
         HeaderMask::TC.is_set(self.byte1)
     }
 
-    const fn rd(self) -> bool {
+    fn rd(&self) -> bool {
         HeaderMask::RD.is_set(self.byte1)
     }
 
-    const fn ra(self) -> bool {
+    fn ra(&self) -> bool {
         HeaderMask::RA.is_set(self.byte2)
     }
 
@@ -50,8 +50,8 @@ impl HeaderFlags {
         0x02
     }
 
-    const fn rcode(self) -> u8 {
-        HeaderMask::RCode.value() & self.byte2
+    fn rcode(&self) -> u8 {
+        HeaderMask::RCode.val() & self.byte2
     }
 }
 
