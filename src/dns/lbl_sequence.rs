@@ -2,23 +2,21 @@ use super::buffer::DNSBuffer;
 use crate::utils::errors::DNSError;
 
 const NULL_BYTE: u8 = 0x00;
-const JMP_IDX: u8 = 0xC0;
-const JMP_MASK: u16 = 0xC00;
+const JMP_BYTE: u8 = 0xC0;
+const JMP_MASK: u16 = 0xC000;
 const DOT: &str = ".";
 
 #[derive(Debug)]
-pub struct LabelSequence {
-    domain: String,
-}
+pub struct LabelSequence(String);
 
 impl TryFrom<&mut DNSBuffer> for LabelSequence {
     type Error = DNSError;
 
     fn try_from(buff: &mut DNSBuffer) -> std::result::Result<Self, Self::Error> {
-        buff.verify_has_capacity(1)?;
+        buff.verify_has_remaining(1)?;
         let buff_cap = buff.capacity();
 
-        if buff.peek() == JMP_IDX {
+        if buff.peek() == JMP_BYTE {
             let mut jmp_idx = buff.read_u16()?;
             jmp_idx ^= JMP_MASK;
 
@@ -48,7 +46,7 @@ impl TryFrom<&mut DNSBuffer> for LabelSequence {
 
             let domain = parts.join(DOT);
 
-            Ok(Self { domain })
+            Ok(Self(domain))
         }
     }
 }
@@ -56,7 +54,7 @@ impl TryFrom<&mut DNSBuffer> for LabelSequence {
 impl LabelSequence {
     #[must_use]
     pub fn domain(&self) -> String {
-        self.domain.clone()
+        self.0.clone()
     }
 }
 
