@@ -1,11 +1,7 @@
 // use anyhow::Result;
 use color_eyre::eyre::Result;
-use dnsrs::dns::{DNSBuffer, DNSHeader, DNSQuestion};
-use tokio::{
-    fs::File,
-    io::{AsyncReadExt, AsyncWriteExt},
-    net::UdpSocket,
-};
+use dnsrs::dns::{DNSAnswer, DNSBuffer, DNSHeader, DNSQuestion};
+use tokio::{fs::File, io::AsyncReadExt, net::UdpSocket};
 
 const HOST: &str = "8.8.8.8";
 const PORT: u16 = 53;
@@ -52,11 +48,42 @@ async fn main() -> Result<()> {
     };
 
     {
-        let mut respf = File::create("lala").await?;
-        let _ = respf.write(&resp_buff[..n_received]).await?;
+        let mut respb = DNSBuffer::from(&resp_buff[..n_received]);
+        let resp_header = DNSHeader::try_from(&mut respb)?;
+        let numq = resp_header.num_q() as usize;
+        let numans = resp_header.num_ans() as usize;
 
-        respf.sync_all().await?;
+        let mut questions = Vec::<DNSQuestion>::with_capacity(numq);
+        let mut answers = Vec::<DNSAnswer>::with_capacity(numans);
+
+        for _ in 0..numq {
+            let q = DNSQuestion::try_from(&mut respb)?;
+            questions.push(q);
+        }
+
+        for _ in 0..numans {
+            let ans = DNSAnswer::try_from(&mut respb)?;
+            answers.push(ans);
+        }
+
+        println!(" ------- Header -----------\n{}", resp_header);
+        println!(" ------- Questions --------");
+        for q in &questions {
+            println!("{}\n", q);
+        }
+
+        println!(" ------- Answers --------");
+        for ans in &answers {
+            println!("{}\n", ans);
+        }
     }
+
+    // {
+    //     let mut respf = File::create("lala").await?;
+    //     let _ = respf.write(&resp_buff[..n_received]).await?;
+    //
+    //     respf.sync_all().await?;
+    // }
 
     Ok(())
 }

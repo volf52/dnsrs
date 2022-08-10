@@ -1,9 +1,11 @@
-pub mod buffer;
-pub mod header;
-pub mod lbl_sequence;
-pub mod question;
-pub mod record_type;
+mod answer;
+mod buffer;
+mod header;
+mod lbl_sequence;
+mod question;
+mod record_type;
 
+pub use answer::DNSAnswer;
 pub use buffer::DNSBuffer;
 pub use header::DNSHeader;
 pub use question::DNSQuestion;
