@@ -14,7 +14,7 @@ impl TryFrom<&mut DNSBuffer> for DNSQuestion {
     fn try_from(buff: &mut DNSBuffer) -> Result<Self, Self::Error> {
         let lbl = LabelSequence::try_from(&mut *buff)?;
 
-        let rtype_val = { buff.read_u16()? };
+        let rtype_val = buff.read_u16()?;
         let record_type = RecordType::try_from(rtype_val)?;
 
         buff.read_u16()?; // Class - Always 1
