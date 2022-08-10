@@ -14,6 +14,18 @@ pub struct DNSHeader {
     n_answers: u16,
 }
 
+impl DNSHeader {
+    #[must_use]
+    pub const fn num_q(&self) -> u16 {
+        self.n_questions
+    }
+
+    #[must_use]
+    pub const fn num_ans(&self) -> u16 {
+        self.n_answers
+    }
+}
+
 impl std::fmt::Display for DNSHeader {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         writeln!(f, "ID = {}", self.id)?;
