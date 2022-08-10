@@ -66,15 +66,15 @@ impl DNSBuffer {
 
     #[must_use]
     pub fn deep_slice_from(&self, start: usize) -> Vec<u8> {
-        let mut v = Vec::with_capacity(self.capacity() - start);
+        let mut v = vec![0; self.capacity - start];
 
         v.copy_from_slice(&self.data[start..]);
 
         v
     }
 
-    pub(crate) const fn verify_has_capacity(&self, n: usize) -> Result<()> {
-        if self.offset + n > self.capacity {
+    pub(crate) const fn verify_has_remaining(&self, n_bytes: usize) -> Result<()> {
+        if self.offset + n_bytes > self.capacity {
             Err(DNSError::BufferFull)
         } else {
             Ok(())
@@ -89,7 +89,7 @@ impl DNSBuffer {
 
     /// Reads a u8 from the buffer
     pub fn read_u8(&mut self) -> Result<u8> {
-        self.verify_has_capacity(1)?;
+        self.verify_has_remaining(1)?;
 
         let byte = self.data[self.offset];
         self.offset += 1;
@@ -99,7 +99,7 @@ impl DNSBuffer {
 
     /// Reads a u16 from the buffer
     pub fn read_u16(&mut self) -> Result<u16> {
-        self.verify_has_capacity(2)?;
+        self.verify_has_remaining(2)?;
 
         let d1 = self.data[self.offset];
         let d2 = self.data[self.offset + 1];
@@ -110,7 +110,7 @@ impl DNSBuffer {
 
     /// Reads a u32 from the buffer
     pub fn read_u32(&mut self) -> Result<u32> {
-        self.verify_has_capacity(4)?;
+        self.verify_has_remaining(4)?;
 
         let d1 = self.data[self.offset];
         let d2 = self.data[self.offset + 1];
@@ -123,7 +123,7 @@ impl DNSBuffer {
 
     /// Reads a string of length [`len`] from the buffer
     pub fn read_string(&mut self, len: usize) -> Result<&str> {
-        self.verify_has_capacity(len)?;
+        self.verify_has_remaining(len)?;
 
         let b = &self.data[self.offset..self.offset + len];
         let val = std::str::from_utf8(b)?;
@@ -136,7 +136,7 @@ impl DNSBuffer {
 
     /// Writes a u8 to the buffer
     pub fn write_u8(&mut self, val: u8) -> Result<()> {
-        self.verify_has_capacity(1)?;
+        self.verify_has_remaining(1)?;
 
         self.data[self.offset] = val;
         self.offset += 1;
@@ -146,7 +146,7 @@ impl DNSBuffer {
 
     /// Writes a u16 to the buffer
     pub fn write_u16(&mut self, val: u16) -> Result<()> {
-        self.verify_has_capacity(2)?;
+        self.verify_has_remaining(2)?;
 
         let d: [u8; 2] = val.to_be_bytes();
 
@@ -160,7 +160,7 @@ impl DNSBuffer {
 
     /// Writes a u32 to the buffer
     pub fn write_u32(&mut self, val: u32) -> Result<()> {
-        self.verify_has_capacity(4)?;
+        self.verify_has_remaining(4)?;
 
         let d: [u8; 4] = val.to_be_bytes();
 
@@ -177,7 +177,7 @@ impl DNSBuffer {
     /// Writes the string [`s`] to the buffer
     pub fn write_string(&mut self, s: &str) -> Result<()> {
         let len = s.len();
-        self.verify_has_capacity(len)?;
+        self.verify_has_remaining(len)?;
 
         self.data[self.offset..self.offset + len].copy_from_slice(s.as_bytes());
         self.offset += len;
